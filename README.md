@@ -7,6 +7,8 @@ Customers book a cab and track the ride; drivers see the jobs assigned to their
 vehicle; administrators manage the fleet, the categories, the bookings and the
 staff accounts.
 
+[![CI](https://github.com/vipul21435/CabBooking-PHP/actions/workflows/ci.yml/badge.svg)](https://github.com/vipul21435/CabBooking-PHP/actions/workflows/ci.yml)
+
 > **This repository was rebuilt.** The project started from a free PHP template
 > that shipped a hardcoded administrator backdoor, database credentials in the
 > source, MD5 passwords and SQL built by string concatenation throughout. All of
@@ -129,10 +131,15 @@ step and the pages reference them directly. The AdminLTE SCSS sources and the
 
 ## Known limitations
 
-- No automated tests. PHP is not installed in the environment this rebuild was
-  carried out in, so the changes are verified by parsing every file and by
-  review, not by running the application. Anyone with Docker can check it in a
-  minute, and that is worth doing before trusting it.
+- No unit tests. There is CI, and it does exercise the application for real:
+  every file is linted with `php -l` on PHP 8.0, 8.2 and 8.3, and a smoke job
+  brings the stack up with Docker and checks that the home page renders, that
+  the seeded administrator signs in, that a wrong password is rejected without
+  leaking SQL, that an account still holding a legacy MD5 hash signs in and
+  comes back out of the database as bcrypt, that `.env` and the schema dump are
+  not reachable over HTTP, and that path traversal in the router is refused.
+  That is end-to-end coverage of what the rebuild changed, but it is not a unit
+  test suite over the domain logic.
 - `classes/Master.php` and `classes/Users.php` still call `extract($_POST)`,
   now with `EXTR_SKIP`. The SQL beneath it is parameterised, so this is untidy
   rather than dangerous, but explicit reads would be better.
