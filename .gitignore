@@ -1,4 +1,4 @@
-# secrets — never commit a real one
+# secrets - never commit a real one
 .env
 
 # uploaded files are user data, not source

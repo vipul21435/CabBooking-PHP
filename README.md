@@ -10,7 +10,7 @@ staff accounts.
 > **This repository was rebuilt.** The project started from a free PHP template
 > that shipped a hardcoded administrator backdoor, database credentials in the
 > source, MD5 passwords and SQL built by string concatenation throughout. All of
-> that is fixed — [SECURITY.md](SECURITY.md) lists what was wrong and what was
+> that is fixed - [SECURITY.md](SECURITY.md) lists what was wrong and what was
 > done about it.
 
 ---
@@ -67,26 +67,26 @@ environment variables always win, so a deployment can set them without a file.
 | `APP_BASE_URL` | `http://localhost:8000` | Trailing slash added if missing |
 | `APP_DEBUG` | `false` | Shows PHP errors. Never true in production |
 | `APP_TIMEZONE` | `Asia/Kolkata` | The template shipped `Asia/Manila` |
-| `DB_HOST` · `DB_PORT` | `127.0.0.1` · `3306` | |
-| `DB_NAME` · `DB_USER` · `DB_PASSWORD` | `cbsphp` · `cbs` · — | |
+| `DB_HOST` | `DB_PORT` | `127.0.0.1` | `3306` | |
+| `DB_NAME` | `DB_USER` | `DB_PASSWORD` | `cbsphp` | `cbs` | - | |
 
 ## How it is laid out
 
 ```
-├── index.php, home.php, booking.php …   customer-facing pages
-├── admin/        fleet, categories, bookings, reports, staff accounts
-├── driver/       the jobs assigned to one cab
-├── classes/
-│   ├── DBConnection.php   the connection and the safe query helpers
-│   ├── Login.php          all three sign-in flows, password hashing
-│   ├── Users.php          staff and customer accounts
-│   ├── Master.php         cabs, categories, bookings
-│   └── SystemSettings.php site settings and the session wrapper
-├── inc/          shared header, footer, navigation, session guard
-├── database/     schema and demo accounts, loaded in name order
-├── docker/       PHP + Apache image
-├── dist/, plugins/   AdminLTE 3 and its dependencies, vendored
-└── uploads/      avatars and cab photographs, written at runtime
++-- index.php, home.php, booking.php ...   customer-facing pages
++-- admin/        fleet, categories, bookings, reports, staff accounts
++-- driver/       the jobs assigned to one cab
++-- classes/
+|   +-- DBConnection.php   the connection and the safe query helpers
+|   +-- Login.php          all three sign-in flows, password hashing
+|   +-- Users.php          staff and customer accounts
+|   +-- Master.php         cabs, categories, bookings
+|   +-- SystemSettings.php site settings and the session wrapper
++-- inc/          shared header, footer, navigation, session guard
++-- database/     schema and demo accounts, loaded in name order
++-- docker/       PHP + Apache image
++-- dist/, plugins/   AdminLTE 3 and its dependencies, vendored
++-- uploads/      avatars and cab photographs, written at runtime
 ```
 
 ### Talking to the database
@@ -117,7 +117,7 @@ comma-separated string.
 
 `Login::hash()` writes bcrypt at cost 12. `Login::verifyStored()` accepts both
 bcrypt and the old 32-character MD5 rows, and any account that still has an MD5
-hash is upgraded to bcrypt the first time it signs in successfully — so the
+hash is upgraded to bcrypt the first time it signs in successfully - so the
 change locked nobody out.
 
 ## What is vendored
@@ -125,7 +125,7 @@ change locked nobody out.
 `dist/` and `plugins/` are [AdminLTE 3](https://adminlte.io/) and its
 dependencies, committed rather than installed, because the project has no build
 step and the pages reference them directly. The AdminLTE SCSS sources and the
-`.map` files were removed in the rebuild — around 10 MB that nothing served.
+`.map` files were removed in the rebuild - around 10 MB that nothing served.
 
 ## Known limitations
 

@@ -27,7 +27,7 @@ for local work and `.env` in `.gitignore`.
 
 **The old values are still in this repository's history.** They were
 `root` with an empty password against `localhost`, which is a default rather
-than a real secret — but if that pair was ever used on a reachable machine,
+than a real secret - but if that pair was ever used on a reachable machine,
 change it.
 
 ### SQL injection
@@ -57,7 +57,7 @@ go through `DBConnection::inList()`, which drops anything non-numeric.
 
 ### Passwords stored as MD5
 
-Unsalted MD5, which is reversible for any common password with a lookup table —
+Unsalted MD5, which is reversible for any common password with a lookup table -
 one of the seeded demo hashes was simply `password`. Hashing is now bcrypt at
 cost 12 through `Login::hash()`. Existing MD5 rows still authenticate and are
 upgraded in place on the first successful sign-in, so the change was not
@@ -108,8 +108,8 @@ valid afterwards. It is regenerated now, and the session cookie is set
 
 ### Errors
 
-`ini_set('display_error', 1)` — note the typo, which meant it never did anything
-— sat in `Login.php`. Error display is now driven by `APP_DEBUG` and defaults to
+`ini_set('display_error', 1)` - note the typo, which meant it never did anything
+- sat in `Login.php`. Error display is now driven by `APP_DEBUG` and defaults to
 off, with a connection failure logged rather than printed.
 
 ## Still outstanding

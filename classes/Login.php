@@ -6,8 +6,8 @@
  *  - Passwords are checked with password_verify() against a bcrypt hash.
  *    Existing MD5 rows still work and are upgraded in place on first successful
  *    sign-in, so nobody is locked out by the change.
- *  - The failure branch used to return `last_qry` — the SQL statement, with the
- *    submitted username interpolated — and the raw mysqli error, straight to
+ *  - The failure branch used to return `last_qry` - the SQL statement, with the
+ *    submitted username interpolated - and the raw mysqli error, straight to
  *    the browser. Both are gone; failures now say only that the details did not
  *    match, and take the same path whether the account exists or not.
  *  - extract($_POST) is gone. Fields are read explicitly.

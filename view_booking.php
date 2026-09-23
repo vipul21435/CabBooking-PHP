@@ -3,7 +3,7 @@ require_once('./config.php');
 
 /**
  * Both the client's booking list and the driver's home page open this, so all
- * three roles are allowed through — but each only for their own bookings.
+ * three roles are allowed through - but each only for their own bookings.
  *
  * Previously the id went into the SQL unescaped and nothing checked ownership,
  * so changing the number in the URL showed any customer's pickup address,

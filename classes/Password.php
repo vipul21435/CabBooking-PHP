@@ -4,7 +4,7 @@
  *
  * Deliberately a class of its own with no side effects. The other classes need
  * these two functions, and `classes/Login.php` cannot be included to get them
- * because — following the pattern the rest of this template uses — it runs a
+ * because - following the pattern the rest of this template uses - it runs a
  * request router the moment it is loaded.
  */
 

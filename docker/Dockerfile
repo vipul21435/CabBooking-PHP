@@ -5,7 +5,8 @@ FROM php:8.2-apache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install -j"$(nproc)" mysqli gd \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install gd \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
