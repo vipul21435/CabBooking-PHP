@@ -103,6 +103,19 @@ jobs:
             *) echo "Hash was not upgraded: $stored"; exit 1 ;;
           esac
 
+      - name: Secrets and dumps are not served
+        run: |
+          set -euo pipefail
+          for path in .env database/01-schema.sql docker-compose.yml; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/$path")
+            echo "  /$path -> $code"
+            case "$code" in
+              403|404) ;;
+              *) echo "$path is reachable over HTTP"; exit 1 ;;
+            esac
+          done
+          echo "Secrets and dumps are not reachable."
+
       - name: Path traversal in the page router is refused
         run: |
           set -euo pipefail

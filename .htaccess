@@ -1,7 +1,28 @@
+# Deny the files that must never be served. The application is served from the
+# repository root, so without this, /.env returns the database credentials and
+# /database/01-schema.sql returns the whole schema including password hashes.
+<FilesMatch "^\.env|\.(env|sql|md|json|lock|yml|yaml|dist|log)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_authz_core.c>
+    <DirectoryMatch "^.*/(database|docker|\.git|\.github)/">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+    # The template set Access-Control-Allow-Origin "*" here, on an application
+    # whose authentication is a session cookie. There is no cross-origin caller,
+    # so it is removed rather than narrowed.
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 <IfModule mod_rewrite.c>
-Header set Access-Control-Allow-Origin "*"
-RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$    /index.php/$2/?page=$1   [L]
 </IfModule>

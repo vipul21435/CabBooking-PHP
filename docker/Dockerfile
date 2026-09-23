@@ -10,7 +10,7 @@ RUN apt-get update \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
-RUN a2enmod rewrite
+RUN a2enmod rewrite headers
 
 # uploads/ is written at runtime.
 RUN mkdir -p /var/www/html/uploads && chown -R www-data:www-data /var/www/html/uploads
