@@ -75,7 +75,7 @@ jobs:
             -d "username=admin" -d "password=admin123" -o /tmp/login.json
           cat /tmp/login.json; echo
           grep -q '"status":"success"' /tmp/login.json \
-            || { echo "Sign-in failed - bcrypt verification or the demo seed is wrong"; exit 1; }
+            || { echo "Sign-in failed. Check bcrypt verification and the demo seed"; exit 1; }
           echo "Admin sign-in succeeded."
 
       - name: A wrong password is rejected, and leaks nothing
@@ -94,7 +94,7 @@ jobs:
       - name: A legacy MD5 account still signs in and is upgraded to bcrypt
         run: |
           set -euo pipefail
-          # 5f4dcc3b... is md5('password') - the format every account used before.
+          # 5f4dcc3b... is md5('password'), the format every account used before.
           docker compose exec -T db mysql -ucbs -pcbs_local_password cbsphp \
             -e "UPDATE users SET password='5f4dcc3b5aa765d61d8327deb882cf99' WHERE username='admin';"
 

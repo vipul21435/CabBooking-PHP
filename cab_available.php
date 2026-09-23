@@ -73,7 +73,7 @@
         })
         $('#cab_list .book_cab').click(function(){
             if("<?= $_settings->userdata('id') && $_settings->userdata('login_type') == 2 ?>" == 1)
-                uni_modal("Book Cab - "+$(this).attr('data-bodyno'),"booking.php?cid="+$(this).attr('data-id'),'mid-large');
+                uni_modal("Book Cab "+$(this).attr('data-bodyno'),"booking.php?cid="+$(this).attr('data-id'),'mid-large');
             else
             location.href = './login.php';
         })

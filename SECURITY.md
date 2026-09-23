@@ -27,7 +27,7 @@ for local work and `.env` in `.gitignore`.
 
 **The old values are still in this repository's history.** They were
 `root` with an empty password against `localhost`, which is a default rather
-than a real secret - but if that pair was ever used on a reachable machine,
+than a real secret, but if that pair was ever used on a reachable machine,
 change it.
 
 ### SQL injection

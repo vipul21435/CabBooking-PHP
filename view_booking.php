@@ -3,11 +3,11 @@ require_once('./config.php');
 
 /**
  * Both the client's booking list and the driver's home page open this, so all
- * three roles are allowed through - but each only for their own bookings.
+ * three roles are allowed through, but each only for their own bookings.
  *
- * Previously the id went into the SQL unescaped and nothing checked ownership,
- * so changing the number in the URL showed any customer's pickup address,
- * destination and phone number.
+ * The id is bound and the row is only loaded for whoever is entitled to see it,
+ * so changing the number in the URL does not reach another customer's pickup
+ * address, destination or phone number.
  */
 $booking_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $viewer_id = $_settings->userdata('id');

@@ -1,8 +1,8 @@
 <?php
 require_once('./../config.php');
 if(isset($_GET['id']) && $_GET['id'] > 0){
-    // Bound, and scoped to this driver's own cab - the id used to go straight
-    // into the SQL and no check tied the booking to whoever was logged in.
+    // Bound, and scoped to this driver's own cab, so the id in the URL cannot
+    // reach another driver's bookings.
     $qry = $db->run("SELECT * FROM `booking_list` WHERE `id` = ? AND `cab_id` = ?", [(int) $_GET['id'], $_settings->userdata('id')])->get_result();
     if($qry->num_rows > 0){
         foreach($qry->fetch_assoc() as $k => $v){

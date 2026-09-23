@@ -2,10 +2,9 @@
 /**
  * Password hashing and verification.
  *
- * Deliberately a class of its own with no side effects. The other classes need
- * these two functions, and `classes/Login.php` cannot be included to get them
- * because - following the pattern the rest of this template uses - it runs a
- * request router the moment it is loaded.
+ * A class of its own with no side effects. The other classes need these two
+ * functions and cannot get them from `classes/Login.php`, which runs a request
+ * router the moment it is loaded.
  */
 
 class Password

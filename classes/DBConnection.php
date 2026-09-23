@@ -3,10 +3,9 @@
  * The MySQL connection, plus the helpers everything else should use instead of
  * building SQL by hand.
  *
- * The version this replaces read its credentials from constants hardcoded in
- * the repository, ignored connection failures (it tested `!$this->conn`, which
- * is never true for a mysqli object, so a bad password surfaced later as a
- * confusing fatal), and offered nothing but raw `query()`.
+ * Credentials come from the environment. mysqli is put into exception mode, so
+ * a bad password fails here with a clear message instead of surfacing later as
+ * a fatal on a broken handle.
  */
 
 if (!defined('DB_SERVER')) {
@@ -154,10 +153,9 @@ class DBConnection
     /**
      * Builds a `SET a = ?, b = ?` clause from a whitelist of column names.
      *
-     * The old code looped over $_POST and interpolated both the column name and
-     * the value straight into the SQL, so any extra form field became part of
-     * the statement. Here the column names can only come from $allowed and the
-     * values only ever travel as bound parameters.
+     * Column names can only come from $allowed. Values only ever travel as
+     * bound parameters, so an extra field in the form cannot become part of
+     * the statement.
      *
      * @return array{0: string, 1: array} the clause and its parameters
      */

@@ -35,7 +35,7 @@ $conn = $db->conn;
 
 /**
  * Escapes text for HTML output. Every value that reaches a page should go
- * through this; the template it came from printed database values raw.
+ * through it.
  */
 function e($value): string
 {
@@ -77,10 +77,9 @@ function isMobileDevice(): bool
 /**
  * Normalises the `page` parameter the three front controllers route on.
  *
- * They used the query string directly as an include path, checking only that
- * the file existed, so `?page=../../somewhere/else` reached any .php file on
- * disk. A page name may now only be letters, digits, underscores, hyphens and
- * single forward slashes between segments.
+ * A page name may only be letters, digits, underscores, hyphens, and single
+ * forward slashes between segments. Anything else falls back to the default,
+ * which keeps a relative path out of the include.
  */
 function safe_page_name($value, string $default = 'home'): string
 {

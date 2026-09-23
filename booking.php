@@ -2,9 +2,8 @@
 require_once('./config.php');
 
 /**
- * The id arrives from the query string. It used to be interpolated straight
- * into the SQL, so `?id=1' OR '1'='1` read the whole table; it is now cast and
- * bound, and the row is only loaded for the client it belongs to.
+ * The id arrives from the query string, so it is cast and bound, and the row is
+ * only loaded for the client it belongs to.
  */
 $booking_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $client_id = $_settings->userdata('id');

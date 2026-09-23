@@ -2,17 +2,13 @@
 /**
  * Authentication for the three kinds of account: staff, client and driver.
  *
- * Changes from the version this replaces:
- *  - Passwords are checked with password_verify() against a bcrypt hash.
- *    Existing MD5 rows still work and are upgraded in place on first successful
- *    sign-in, so nobody is locked out by the change.
- *  - The failure branch used to return `last_qry` - the SQL statement, with the
- *    submitted username interpolated - and the raw mysqli error, straight to
- *    the browser. Both are gone; failures now say only that the details did not
- *    match, and take the same path whether the account exists or not.
- *  - extract($_POST) is gone. Fields are read explicitly.
- *  - The session id is regenerated on sign-in, so a session fixed before login
- *    cannot be reused afterwards.
+ * Passwords are checked with password_verify() against a bcrypt hash. Rows that
+ * still hold an MD5 hash authenticate and are rewritten as bcrypt on the first
+ * successful sign-in.
+ *
+ * A failure says only that the details did not match, and takes the same path
+ * whether or not the account exists. The session id is regenerated on sign-in so
+ * an id fixed beforehand cannot be reused.
  */
 
 require_once __DIR__ . '/../config.php';

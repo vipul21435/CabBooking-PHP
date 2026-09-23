@@ -119,7 +119,7 @@ comma-separated string.
 
 `Login::hash()` writes bcrypt at cost 12. `Login::verifyStored()` accepts both
 bcrypt and the old 32-character MD5 rows, and any account that still has an MD5
-hash is upgraded to bcrypt the first time it signs in successfully - so the
+hash is upgraded to bcrypt the first time it signs in successfully, so the
 change locked nobody out.
 
 ## What is vendored
@@ -127,7 +127,7 @@ change locked nobody out.
 `dist/` and `plugins/` are [AdminLTE 3](https://adminlte.io/) and its
 dependencies, committed rather than installed, because the project has no build
 step and the pages reference them directly. The AdminLTE SCSS sources and the
-`.map` files were removed in the rebuild - around 10 MB that nothing served.
+`.map` files were removed in the rebuild, around 10 MB that nothing served.
 
 ## Known limitations
 

@@ -3,11 +3,7 @@
  * Application bootstrap: paths and configuration.
  *
  * Configuration comes from the environment, with a .env file for local work.
- * Nothing secret is committed - see .env.example and SECURITY.md.
- *
- * The version this replaces hardcoded the MySQL host, user, password and
- * database here, and carried a "developer" account with a fixed MD5 password
- * that bypassed the users table entirely. Both are gone.
+ * Nothing secret is committed. See .env.example and SECURITY.md.
  */
 
 if (!defined('BASE_APP')) {

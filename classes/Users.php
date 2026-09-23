@@ -13,11 +13,8 @@ Class Users extends DBConnection {
 	/**
 	 * Creates or updates a staff user.
 	 *
-	 * The version this replaces ran extract($_POST), then looped over $_POST
-	 * building "col = 'value'" fragments and interpolated the lot into
-	 * "INSERT INTO users set {$data}". Both the column names and the values
-	 * came from the request, so any extra form field became part of the
-	 * statement. Columns now come from a fixed whitelist and values are bound.
+	 * Columns come from a fixed whitelist and values are bound, so the shape of
+	 * the form cannot change the shape of the statement.
 	 */
 	public function save_users(){
 		$id = (int) ($_POST['id'] ?? 0);
