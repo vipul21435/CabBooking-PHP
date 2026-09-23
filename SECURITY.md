@@ -114,7 +114,6 @@ off, with a connection failure logged rather than printed.
 
 ## Still outstanding
 
-Being straight about what was not done:
 
 - **No CSRF protection.** Any state-changing request carrying a valid session
   cookie is accepted, so a page on another site can act as a logged-in user.
