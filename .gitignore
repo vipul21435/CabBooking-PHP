@@ -1,0 +1,20 @@
+# secrets — never commit a real one
+.env
+
+# uploaded files are user data, not source
+uploads/*
+!uploads/.gitkeep
+
+# dependencies and build output
+node_modules/
+vendor/
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# logs and dumps
+*.log
+*.sql.bak

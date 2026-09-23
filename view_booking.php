@@ -1,17 +1,55 @@
 <?php
 require_once('./config.php');
-if(isset($_GET['id']) && $_GET['id'] > 0){
-    $qry = $conn->query("SELECT * from `booking_list` where id = '{$_GET['id']}' ");
-    if($qry->num_rows > 0){
-        foreach($qry->fetch_assoc() as $k => $v){
-            $$k=$v;
-        }
-        $qry2 = $conn->query("SELECT c.*, cc.name as category from `cab_list` c inner join category_list cc on c.category_id = cc.id where c.id = '{$cab_id}' ");
-        if($qry2->num_rows > 0){
-            foreach($qry2->fetch_assoc() as $k => $v){
-                if(!isset($$k))
-                $$k=$v;
-            }
+
+/**
+ * Both the client's booking list and the driver's home page open this, so all
+ * three roles are allowed through — but each only for their own bookings.
+ *
+ * Previously the id went into the SQL unescaped and nothing checked ownership,
+ * so changing the number in the URL showed any customer's pickup address,
+ * destination and phone number.
+ */
+$booking_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+$viewer_id = $_settings->userdata('id');
+$login_type = (int) $_settings->userdata('login_type');
+
+$booking = null;
+if ($booking_id) {
+    if ($login_type === 1) {
+        $booking = $db->fetchOne('SELECT * FROM `booking_list` WHERE `id` = ?', [$booking_id]);
+    } elseif ($login_type === 2) {
+        $booking = $db->fetchOne(
+            'SELECT * FROM `booking_list` WHERE `id` = ? AND `client_id` = ?',
+            [$booking_id, $viewer_id]
+        );
+    } elseif ($login_type === 3) {
+        $booking = $db->fetchOne(
+            'SELECT * FROM `booking_list` WHERE `id` = ? AND `cab_id` = ?',
+            [$booking_id, $viewer_id]
+        );
+    }
+}
+
+if (!$booking) {
+    echo '<div class="alert alert-danger">That booking is not available.</div>';
+    return;
+}
+
+foreach ($booking as $k => $v) {
+    $$k = $v;
+}
+
+$cab = $db->fetchOne(
+    'SELECT c.*, cc.name AS category FROM `cab_list` c
+       INNER JOIN `category_list` cc ON c.category_id = cc.id
+     WHERE c.id = ?',
+    [$cab_id]
+);
+
+if ($cab) {
+    foreach ($cab as $k => $v) {
+        if (!isset($$k)) {
+            $$k = $v;
         }
     }
 }

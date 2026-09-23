@@ -36,8 +36,9 @@
 						$i = 1;
 						$qry = $conn->query("SELECT s.*,concat(c.lastname,', ', c.firstname,' ',c.middlename) as fullname from service_requests s inner join client_list c on s.client_id = c.id order by unix_timestamp(s.date_created) desc");
 						while($row = $qry->fetch_assoc()):
-							$sids = $conn->query("SELECT meta_value FROM request_meta where request_id = '{$row['id']}' and meta_field = 'service_id'")->fetch_assoc()['meta_value'];
-							$services  = $conn->query("SELECT * FROM service_list where id in ({$sids}) ");
+							$sids = $db->fetchValue("SELECT `meta_value` FROM `request_meta` WHERE `request_id` = ? AND `meta_field` = 'service_id'", [$row['id']]);
+							[$placeholders, $serviceIds] = DBConnection::inList($sids);
+							$services = $db->run("SELECT * FROM `service_list` WHERE `id` IN ({$placeholders})", $serviceIds)->get_result();
 					?>
 						<tr>
 							<td class="text-center"><?php echo $i++; ?></td>

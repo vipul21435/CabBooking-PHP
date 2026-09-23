@@ -1,0 +1,52 @@
+# Brings up PHP and MySQL with the schema already loaded:
+#
+#   cp .env.example .env
+#   docker compose up
+#   open http://localhost:8000
+#
+# The database credentials here match .env.example. They are local-only
+# development values and are not secrets.
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_local_password
+      MYSQL_DATABASE: cbsphp
+      MYSQL_USER: cbs
+      MYSQL_PASSWORD: cbs_local_password
+    ports:
+      - "3306:3306"
+    volumes:
+      # Anything in this directory is run once, in name order, on first boot.
+      - ./database:/docker-entrypoint-initdb.d:ro
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucbs", "-pcbs_local_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:80"
+    environment:
+      APP_BASE_URL: http://localhost:8000/
+      APP_DEBUG: "true"
+      APP_TIMEZONE: Asia/Kolkata
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: cbsphp
+      DB_USER: cbs
+      DB_PASSWORD: cbs_local_password
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

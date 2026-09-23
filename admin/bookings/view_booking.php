@@ -1,12 +1,12 @@
 <?php
 require_once('./../../config.php');
 if(isset($_GET['id']) && $_GET['id'] > 0){
-    $qry = $conn->query("SELECT  b.*,concat(c.lastname,', ', c.firstname,' ',c.middlename) as client from `booking_list` b inner join client_list c on b.client_id = c.id where b.id = '{$_GET['id']}' ");
+    $qry = $db->run("SELECT b.*, CONCAT(c.lastname, ', ', c.firstname, ' ', c.middlename) AS client FROM `booking_list` b INNER JOIN `client_list` c ON b.client_id = c.id WHERE b.id = ?", [(int) $_GET['id']])->get_result();
     if($qry->num_rows > 0){
         foreach($qry->fetch_assoc() as $k => $v){
             $$k=$v;
         }
-        $qry2 = $conn->query("SELECT c.*, cc.name as category from `cab_list` c inner join category_list cc on c.category_id = cc.id where c.id = '{$cab_id}' ");
+        $qry2 = $db->run("SELECT c.*, cc.name AS category FROM `cab_list` c INNER JOIN `category_list` cc ON c.category_id = cc.id WHERE c.id = ?", [$cab_id])->get_result();
         if($qry2->num_rows > 0){
             foreach($qry2->fetch_assoc() as $k => $v){
                 if(!isset($$k))

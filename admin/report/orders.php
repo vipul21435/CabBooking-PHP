@@ -63,8 +63,14 @@ $date_end = isset($_GET['date_end']) ? $_GET['date_end'] :  date("Y-m-d") ;
                         $mechanic = $conn->query("SELECT * FROM mechanics_list");
                         $result = $mechanic->fetch_all(MYSQLI_ASSOC);
                         $mech_arr = array_column($result,'name','id');
-                        $where = "where date(o.date_created) between '{$date_start}' and '{$date_end}'";
-                        $qry = $conn->query("SELECT o.*,CONCAT(c.lastname,', ',c.firstname,' ',c.middlename) as fullname from order_list o inner join client_list c on o.client_id = c.id {$where} order by unix_timestamp(o.date_created) desc");
+                        $qry = $db->run(
+                            "SELECT o.*, CONCAT(c.lastname, ', ', c.firstname, ' ', c.middlename) AS fullname
+                               FROM `order_list` o
+                               INNER JOIN `client_list` c ON o.client_id = c.id
+                              WHERE DATE(o.date_created) BETWEEN ? AND ?
+                              ORDER BY unix_timestamp(o.date_created) DESC",
+                            [$date_start, $date_end]
+                        )->get_result();
                         while($row = $qry->fetch_assoc()):
                     ?>
                     <tr>

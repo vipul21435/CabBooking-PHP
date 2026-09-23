@@ -3,7 +3,7 @@
 <html lang="en">
 <?php require_once('inc/header.php') ?>
 <body>
-<?php $page = isset($_GET['p']) ? $_GET['p'] : 'home';  ?>
+<?php $page = safe_page_name($_GET['p'] ?? 'home');  ?>
 <?php require_once('inc/topBarNav.php') ?>
      <?php if($_settings->chk_flashdata('success')): ?>
       <script>

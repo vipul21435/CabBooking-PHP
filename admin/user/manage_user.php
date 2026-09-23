@@ -1,7 +1,7 @@
 
 <?php 
 if(isset($_GET['id']) && $_GET['id'] > 0){
-    $user = $conn->query("SELECT * FROM users where id ='{$_GET['id']}'");
+    $user = $db->run("SELECT * FROM `users` WHERE `id` = ?", [(int) $_GET['id']])->get_result();
     foreach($user->fetch_array() as $k =>$v){
         $meta[$k] = $v;
     }

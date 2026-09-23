@@ -21,7 +21,7 @@ Class Master extends DBConnection {
 		}
 	}
 	function save_category(){
-		extract($_POST);
+		extract($_POST, EXTR_SKIP);
 		$data = "";
 		foreach($_POST as $k =>$v){
 			if(!in_array($k,array('id','description'))){
@@ -33,7 +33,9 @@ Class Master extends DBConnection {
 			if(!empty($data)) $data .=",";
 				$data .= " `description`='".addslashes(htmlentities($description))."' ";
 		}
-		$check = $this->conn->query("SELECT * FROM `category_list` where `name` = '{$name}' and delete_flag = 0 ".(!empty($id) ? " and id != {$id} " : "")." ")->num_rows;
+		$check = !empty($id)
+			? $this->count("SELECT COUNT(*) FROM `category_list` WHERE `name` = ? AND `delete_flag` = 0 AND `id` != ?", [$name, (int) $id])
+			: $this->count("SELECT COUNT(*) FROM `category_list` WHERE `name` = ? AND `delete_flag` = 0", [$name]);
 		if($this->capture_err())
 			return $this->capture_err();
 		if($check > 0){
@@ -62,8 +64,8 @@ Class Master extends DBConnection {
 		return json_encode($resp);
 	}
 	function delete_category(){
-		extract($_POST);
-		$del = $this->conn->query("UPDATE `category_list` set delete_flag = 1 where id = '{$id}'");
+		extract($_POST, EXTR_SKIP);
+		$del = $this->execute("UPDATE `category_list` SET `delete_flag` = 1 WHERE `id` = ?", [(int) $id]) >= 0;
 		if($del){
 			$resp['status'] = 'success';
 			$this->settings->set_flashdata('success'," Category successfully deleted.");
@@ -76,14 +78,14 @@ Class Master extends DBConnection {
 	}
 	function save_cab(){
 		if(!empty($_POST['password']))
-			$_POST['password'] = md5($_POST['password']);
+			$_POST['password'] = Password::hash($_POST['password']);
 		else
 			unset($_POST['password']);
 		if(empty($_POST['id'])){
 			$prefix = date('Ym-');
 			$code = sprintf("%'.05d",1);
 			while(true){
-				$check = $this->conn->query("SELECT * FROM `cab_list` where reg_code = '{$prefix}{$code}'")->num_rows;
+				$check = $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `reg_code` = ?", [$prefix . $code]);
 				if($check > 0){
 					$code = sprintf("%'.05d",ceil($code) + 1);
 				}else{
@@ -94,7 +96,7 @@ Class Master extends DBConnection {
 		}
 
 
-		extract($_POST);
+		extract($_POST, EXTR_SKIP);
 		$data = "";
 		foreach($_POST as $k =>$v){
 			if(!in_array($k,array('id','oldpassword'))){
@@ -104,7 +106,9 @@ Class Master extends DBConnection {
 			}
 		}
 		if(isset($cab_reg_no)){
-			$check = $this->conn->query("SELECT * FROM `cab_list` where `cab_reg_no` = '{$cab_reg_no}' ".(!empty($id) ? " and id != {$id} " : "")." ")->num_rows;
+			$check = !empty($id)
+				? $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `cab_reg_no` = ? AND `id` != ?", [$cab_reg_no, (int) $id])
+				: $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `cab_reg_no` = ?", [$cab_reg_no]);
 			if($this->capture_err())
 				return $this->capture_err();
 			if($check > 0){
@@ -115,7 +119,9 @@ Class Master extends DBConnection {
 			}
 		}
 		if(isset($body_no)){
-			$check = $this->conn->query("SELECT * FROM `cab_list` where `body_no` = '{$body_no}' ".(!empty($id) ? " and id != {$id} " : "")." ")->num_rows;
+			$check = !empty($id)
+				? $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `body_no` = ? AND `id` != ?", [$body_no, (int) $id])
+				: $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `body_no` = ?", [$body_no]);
 			if($this->capture_err())
 				return $this->capture_err();
 			if($check > 0){
@@ -126,8 +132,8 @@ Class Master extends DBConnection {
 			}
 		}
 		if(isset($oldpassword)){
-			$cur_pass = $this->conn->query("SELECT `password` from `cab_list` where id = '{$this->settings->userdata('id')}'")->fetch_array()[0];
-			if(md5($oldpassword) != $cur_pass){
+			$cur_pass = $this->fetchValue("SELECT `password` FROM `cab_list` WHERE `id` = ?", [$this->settings->userdata('id')]);
+			if(!Password::verify((string) $oldpassword, (string) $cur_pass)){
 				$resp['status'] = 'failed';
 				$resp['msg'] = " Current Password is Incorrect.";
 				return json_encode($resp);
@@ -187,7 +193,7 @@ Class Master extends DBConnection {
 						}
 					}
 					if(isset($uploaded_img)){
-						$this->conn->query("UPDATE cab_list set `image_path` = CONCAT('{$fname}','?v=',unix_timestamp(CURRENT_TIMESTAMP)) where id = '{$cid}' ");
+						$this->execute("UPDATE `cab_list` SET `image_path` = CONCAT(?, '?v=', unix_timestamp(CURRENT_TIMESTAMP)) WHERE `id` = ?", [$fname, $cid]);
 						if($id == $this->settings->userdata('id')){
 								$this->settings->set_userdata('avatar',$fname);
 						}
@@ -203,8 +209,8 @@ Class Master extends DBConnection {
 		return json_encode($resp);
 	}
 	function delete_cab(){
-		extract($_POST);
-		$del = $this->conn->query("UPDATE `cab_list` set `delete_flag` = 1  where id = '{$id}'");
+		extract($_POST, EXTR_SKIP);
+		$del = $this->execute("UPDATE `cab_list` SET `delete_flag` = 1 WHERE `id` = ?", [(int) $id]) >= 0;
 		if($del){
 			$resp['status'] = 'success';
 			$this->settings->set_flashdata('success'," Cab successfully deleted.");
@@ -220,7 +226,7 @@ Class Master extends DBConnection {
 			$prefix = date('Ym-');
 			$code = sprintf("%'.05d",1);
 			while(true){
-				$check = $this->conn->query("SELECT * FROM `cab_list` where reg_code = '{$prefix}{$code}'")->num_rows;
+				$check = $this->count("SELECT COUNT(*) FROM `cab_list` WHERE `reg_code` = ?", [$prefix . $code]);
 				if($check > 0){
 					$code = sprintf("%'.05d",ceil($code) + 1);
 				}else{
@@ -230,7 +236,7 @@ Class Master extends DBConnection {
 			$_POST['client_id'] = $this->settings->userdata('id');
 			$_POST['ref_code'] = $prefix.$code;
 		}
-		extract($_POST);
+		extract($_POST, EXTR_SKIP);
 		$data = "";
 		foreach($_POST as $k =>$v){
 			if(!in_array($k,array('id'))){
@@ -258,8 +264,8 @@ Class Master extends DBConnection {
 		return json_encode($resp);
 	}
 	function delete_booking(){
-		extract($_POST);
-		$del = $this->conn->query("DELETE FROM `booking_list` where id = '{$id}'");
+		extract($_POST, EXTR_SKIP);
+		$del = $this->execute("DELETE FROM `booking_list` WHERE `id` = ?", [(int) $id]) >= 0;
 		if($del){
 			$resp['status'] = 'success';
 			$this->settings->set_flashdata('success'," Booking successfully deleted.");
@@ -271,8 +277,8 @@ Class Master extends DBConnection {
 
 	}
 	function update_booking_status(){
-		extract($_POST);
-		$update = $this->conn->query("UPDATE `booking_list` set `status` = '{$status}' where id = '{$id}' ");
+		extract($_POST, EXTR_SKIP);
+		$update = $this->execute("UPDATE `booking_list` SET `status` = ? WHERE `id` = ?", [(int) $status, (int) $id]) >= 0;
 		if($update){
 			$resp['status'] = 'success';
 			$this->settings->set_flashdata('success'," Booking status successfully updated.");

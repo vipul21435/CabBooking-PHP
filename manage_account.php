@@ -1,6 +1,6 @@
 <?php 
 if($_settings->userdata('id') > 0 && $_settings->userdata('login_type') == 2){
-    $qry = $conn->query("SELECT * FROM `client_list` where id = '{$_settings->userdata('id')}'");
+    $qry = $db->run("SELECT * FROM `client_list` WHERE `id` = ?", [$_settings->userdata('id')])->get_result();
     if($qry->num_rows >0){
         $res = $qry->fetch_array();
         foreach($res as $k => $v){

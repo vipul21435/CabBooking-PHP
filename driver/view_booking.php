@@ -1,12 +1,14 @@
 <?php
 require_once('./../config.php');
 if(isset($_GET['id']) && $_GET['id'] > 0){
-    $qry = $conn->query("SELECT * from `booking_list` where id = '{$_GET['id']}' ");
+    // Bound, and scoped to this driver's own cab — the id used to go straight
+    // into the SQL and no check tied the booking to whoever was logged in.
+    $qry = $db->run("SELECT * FROM `booking_list` WHERE `id` = ? AND `cab_id` = ?", [(int) $_GET['id'], $_settings->userdata('id')])->get_result();
     if($qry->num_rows > 0){
         foreach($qry->fetch_assoc() as $k => $v){
             $$k=$v;
         }
-        $qry2 = $conn->query("SELECT c.*, cc.name as category from `cab_list` c inner join category_list cc on c.category_id = cc.id where c.id = '{$cab_id}' ");
+        $qry2 = $db->run("SELECT c.*, cc.name AS category FROM `cab_list` c INNER JOIN `category_list` cc ON c.category_id = cc.id WHERE c.id = ?", [$cab_id])->get_result();
         if($qry2->num_rows > 0){
             foreach($qry2->fetch_assoc() as $k => $v){
                 if(!isset($$k))

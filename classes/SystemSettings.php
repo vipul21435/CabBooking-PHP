@@ -34,9 +34,9 @@ class SystemSettings extends DBConnection{
 			if(!in_array($key,array("content")))
 			if(isset($_SESSION['system_info'][$key])){
 				$value = str_replace("'", "&apos;", $value);
-				$qry = $this->conn->query("UPDATE system_info set meta_value = '{$value}' where meta_field = '{$key}' ");
+				$qry = $this->execute("UPDATE `system_info` SET `meta_value` = ? WHERE `meta_field` = ?", [$value, $key]) >= 0;
 			}else{
-				$qry = $this->conn->query("INSERT into system_info set meta_value = '{$value}', meta_field = '{$key}' ");
+				$qry = $this->execute("INSERT INTO `system_info` SET `meta_value` = ?, `meta_field` = ?", [$value, $key]) >= 0;
 			}
 		}
 		if(isset($_POST['content']) && is_array($_POST['content'])){
@@ -48,20 +48,20 @@ class SystemSettings extends DBConnection{
 			$fname = 'uploads/'.strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
 			$move = move_uploaded_file($_FILES['img']['tmp_name'],'../'. $fname);
 			if(isset($_SESSION['system_info']['logo'])){
-				$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'logo' ");
+				$qry = $this->execute("UPDATE `system_info` SET `meta_value` = ? WHERE `meta_field` = 'logo'", [$fname]) >= 0;
 				if(is_file('../'.$_SESSION['system_info']['logo'])) unlink('../'.$_SESSION['system_info']['logo']);
 			}else{
-				$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'logo' ");
+				$qry = $this->execute("INSERT INTO `system_info` SET `meta_value` = ?, `meta_field` = 'logo'", [$fname]) >= 0;
 			}
 		}
 		if(isset($_FILES['cover']) && $_FILES['cover']['tmp_name'] != ''){
 			$fname = 'uploads/'.strtotime(date('y-m-d H:i')).'_'.$_FILES['cover']['name'];
 			$move = move_uploaded_file($_FILES['cover']['tmp_name'],'../'. $fname);
 			if(isset($_SESSION['system_info']['cover'])){
-				$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'cover' ");
+				$qry = $this->execute("UPDATE `system_info` SET `meta_value` = ? WHERE `meta_field` = 'cover'", [$fname]) >= 0;
 				if(is_file('../'.$_SESSION['system_info']['cover'])) unlink('../'.$_SESSION['system_info']['cover']);
 			}else{
-				$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'cover' ");
+				$qry = $this->execute("INSERT INTO `system_info` SET `meta_value` = ?, `meta_field` = 'cover'", [$fname]) >= 0;
 			}
 		}
 		

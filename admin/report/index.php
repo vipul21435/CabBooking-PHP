@@ -66,14 +66,19 @@ $date_end = isset($_GET['date_end']) ? $_GET['date_end'] :  date("Y-m-d") ;
                         $mechanic = $conn->query("SELECT * FROM mechanics_list");
                         $result = $mechanic->fetch_all(MYSQLI_ASSOC);
                         $mech_arr = array_column($result,'name','id');
-                        $where = "where date(date_created) between '{$date_start}' and '{$date_end}'";
-                        $qry = $conn->query("SELECT * from service_requests {$where} order by unix_timestamp(date_created) desc");
+                        $qry = $db->run(
+                            "SELECT * FROM `service_requests`
+                              WHERE DATE(date_created) BETWEEN ? AND ?
+                              ORDER BY unix_timestamp(date_created) DESC",
+                            [$date_start, $date_end]
+                        )->get_result();
                         while($row = $qry->fetch_assoc()):
-                        $meta = $conn->query("SELECT * FROM request_meta where request_id = '{$row['id']}'");
+                        $meta = $db->run("SELECT * FROM `request_meta` WHERE `request_id` = ?", [$row['id']])->get_result();
                         while($mrow = $meta->fetch_assoc()){
                             $row[$mrow['meta_field']] =$mrow['meta_value'];
                         }
-                        $services  = $conn->query("SELECT * FROM service_list where id in ({$row['service_id']}) ");
+                        [$placeholders, $serviceIds] = DBConnection::inList($row['service_id']);
+                        $services = $db->run("SELECT * FROM `service_list` WHERE `id` IN ({$placeholders})", $serviceIds)->get_result();
 
                         while($srow = $services->fetch_assoc()):
                             

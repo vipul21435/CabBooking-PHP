@@ -1,6 +1,6 @@
 <?php
 if(isset($_GET['id']) && $_GET['id'] > 0){
-    $qry = $conn->query("SELECT c.*, cc.name as category from `cab_list` c inner join category_list cc on c.category_id = cc.id where c.id = '{$_GET['id']}' ");
+    $qry = $db->run("SELECT c.*, cc.name AS category FROM `cab_list` c INNER JOIN `category_list` cc ON c.category_id = cc.id WHERE c.id = ?", [(int) $_GET['id']])->get_result();
     if($qry->num_rows > 0){
         foreach($qry->fetch_assoc() as $k => $v){
             $$k=stripslashes($v);

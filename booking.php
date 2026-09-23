@@ -1,10 +1,23 @@
 <?php
 require_once('./config.php');
-if(isset($_GET['id']) && $_GET['id'] > 0){
-    $qry = $conn->query("SELECT * from `booking_list` where id = '{$_GET['id']}' ");
-    if($qry->num_rows > 0){
-        foreach($qry->fetch_assoc() as $k => $v){
-            $$k=$v;
+
+/**
+ * The id arrives from the query string. It used to be interpolated straight
+ * into the SQL, so `?id=1' OR '1'='1` read the whole table; it is now cast and
+ * bound, and the row is only loaded for the client it belongs to.
+ */
+$booking_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+$client_id = $_settings->userdata('id');
+$login_type = (int) $_settings->userdata('login_type');
+
+if ($booking_id) {
+    $booking = ($login_type === 1)
+        ? $db->fetchOne('SELECT * FROM `booking_list` WHERE `id` = ?', [$booking_id])
+        : $db->fetchOne('SELECT * FROM `booking_list` WHERE `id` = ? AND `client_id` = ?', [$booking_id, $client_id]);
+
+    if ($booking) {
+        foreach ($booking as $k => $v) {
+            $$k = $v;
         }
     }
 }

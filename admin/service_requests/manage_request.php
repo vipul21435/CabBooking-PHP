@@ -1,11 +1,11 @@
 <?php 
 require_once('./../../config.php');
 if(isset($_GET['id'])){
-$qry = $conn->query("SELECT s.*,cc.category,concat(c.lastname,', ', c.firstname,' ',c.middlename) as fullname,c.email,c.contact, c.address FROM `service_requests` s inner join `categories` cc inner join client_list c on s.client_id = c.id where s.id = '{$_GET['id']}' ");
+$qry = $db->run("SELECT s.*, cc.category, CONCAT(c.lastname, ', ', c.firstname, ' ', c.middlename) AS fullname, c.email, c.contact, c.address FROM `service_requests` s INNER JOIN `categories` cc INNER JOIN `client_list` c ON s.client_id = c.id WHERE s.id = ?", [(int) $_GET['id']])->get_result();
 foreach($qry->fetch_array() as $k => $v){
     $$k = $v;
 }
-$meta = $conn->query("SELECT * FROM `request_meta` where request_id = '{$id}'");
+$meta = $db->run("SELECT * FROM `request_meta` WHERE `request_id` = ?", [$id])->get_result();
 while($row = $meta->fetch_assoc()){
     ${$row['meta_field']} = $row['meta_value'];
 }

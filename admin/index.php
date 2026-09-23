@@ -7,7 +7,7 @@
      <?php require_once('inc/topBarNav.php') ?>
      <?php require_once('inc/navigation.php') ?>
               
-     <?php $page = isset($_GET['page']) ? $_GET['page'] : 'home';  ?>
+     <?php $page = safe_page_name($_GET['page'] ?? 'home');  ?>
      <?php if($_settings->chk_flashdata('success')): ?>
       <script>
         alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
