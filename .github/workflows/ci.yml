@@ -57,31 +57,38 @@ jobs:
           done
           echo "The app never came up."; docker compose logs; exit 1
 
+      # Every check below writes the response to a file before grepping it.
+      # Piping curl into `grep -q` under `set -o pipefail` fails the step even
+      # when the match succeeds: grep exits on the first hit, curl loses the
+      # pipe, and returns 23.
       - name: The home page renders
         run: |
           set -euo pipefail
-          curl -fsS http://localhost:8000/ | grep -qi "<html" || { echo "No HTML returned"; exit 1; }
+          curl -fsS http://localhost:8000/ -o /tmp/home.html
+          grep -qi "<html" /tmp/home.html || { echo "No HTML returned"; head -c 400 /tmp/home.html; exit 1; }
           echo "Home page renders."
 
       - name: The admin sign-in works with the seeded account
         run: |
           set -euo pipefail
-          response=$(curl -fsS -X POST "http://localhost:8000/classes/Login.php?f=login" \
-            -d "username=admin" -d "password=admin123")
-          echo "Response: $response"
-          echo "$response" | grep -q '"status":"success"' \
+          curl -fsS -X POST "http://localhost:8000/classes/Login.php?f=login" \
+            -d "username=admin" -d "password=admin123" -o /tmp/login.json
+          cat /tmp/login.json; echo
+          grep -q '"status":"success"' /tmp/login.json \
             || { echo "Sign-in failed - bcrypt verification or the demo seed is wrong"; exit 1; }
           echo "Admin sign-in succeeded."
 
       - name: A wrong password is rejected, and leaks nothing
         run: |
           set -euo pipefail
-          response=$(curl -fsS -X POST "http://localhost:8000/classes/Login.php?f=login" \
-            -d "username=admin" -d "password=definitely-not-the-password")
-          echo "Response: $response"
-          echo "$response" | grep -q '"status":"incorrect"' || { echo "Wrong password was not rejected"; exit 1; }
+          curl -fsS -X POST "http://localhost:8000/classes/Login.php?f=login" \
+            -d "username=admin" -d "password=definitely-not-the-password" -o /tmp/bad.json
+          cat /tmp/bad.json; echo
+          grep -q '"status":"incorrect"' /tmp/bad.json || { echo "Wrong password was not rejected"; exit 1; }
           # The old code returned the SQL statement and the mysqli error here.
-          echo "$response" | grep -qi "select\|last_qry\|mysql" && { echo "The failure response leaks internals"; exit 1; }
+          if grep -qiE "select|last_qry|mysql" /tmp/bad.json; then
+            echo "The failure response leaks internals"; exit 1
+          fi
           echo "Wrong password rejected cleanly."
 
       - name: A legacy MD5 account still signs in and is upgraded to bcrypt
@@ -92,7 +99,9 @@ jobs:
             -e "UPDATE users SET password='5f4dcc3b5aa765d61d8327deb882cf99' WHERE username='admin';"
 
           curl -fsS -X POST "http://localhost:8000/classes/Login.php?f=login" \
-            -d "username=admin" -d "password=password" | grep -q '"status":"success"' \
+            -d "username=admin" -d "password=password" -o /tmp/legacy.json
+          cat /tmp/legacy.json; echo
+          grep -q '"status":"success"' /tmp/legacy.json \
             || { echo "A legacy MD5 account could not sign in"; exit 1; }
 
           stored=$(docker compose exec -T db mysql -N -B -ucbs -pcbs_local_password cbsphp \
@@ -119,8 +128,10 @@ jobs:
       - name: Path traversal in the page router is refused
         run: |
           set -euo pipefail
-          body=$(curl -fsS "http://localhost:8000/admin/index.php?page=../../config")
-          echo "$body" | grep -qi "DB_PASSWORD\|mysqli" && { echo "Traversal reached a file it should not"; exit 1; }
+          curl -fsS "http://localhost:8000/admin/index.php?page=../../config" -o /tmp/traversal.html
+          if grep -qiE "DB_PASSWORD|mysqli" /tmp/traversal.html; then
+            echo "Traversal reached a file it should not"; exit 1
+          fi
           echo "Traversal refused."
 
       - name: Tear down
