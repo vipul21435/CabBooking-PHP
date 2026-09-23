@@ -114,19 +114,22 @@ off, with a connection failure logged rather than printed.
 
 ## Still outstanding
 
+There is no CSRF protection. Any state-changing request carrying a valid session
+cookie is accepted, so a page on another site can act as a logged-in user. That
+is the biggest thing left.
 
-- **No CSRF protection.** Any state-changing request carrying a valid session
-  cookie is accepted, so a page on another site can act as a logged-in user.
-  This is the most significant thing left.
-- **Output escaping is inconsistent.** `e()` exists and the rebuilt pages use
-  it, but older templates still echo database values into HTML raw, so a stored
-  value containing markup would render.
-- **`extract($_POST)` remains** in `Master.php` and `Users.php`, now with
-  `EXTR_SKIP` so it cannot overwrite an existing variable. The SQL beneath it is
-  parameterised, which is what made it dangerous before.
-- **No rate limiting** on the sign-in endpoints.
-- **Uploads** are checked with `mime_content_type` and re-encoded through GD,
-  which is reasonable, but they are written under the web root.
+Output escaping is uneven. `e()` exists and the pages touched in the rebuild use
+it, but older templates still echo database values into HTML raw, so a stored
+value containing markup would render.
+
+`extract($_POST)` is still there in `Master.php` and `Users.php`, now with
+`EXTR_SKIP` so it cannot overwrite a variable that already exists. The SQL
+underneath it is bound, which is what made it dangerous before.
+
+The sign-in endpoints have no rate limiting.
+
+Uploads are checked with `mime_content_type` and re-encoded through GD, which is
+reasonable, but they land under the web root.
 
 ## Reporting something
 
